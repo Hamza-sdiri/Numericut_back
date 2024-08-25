@@ -8,7 +8,7 @@ mongoose.connect('mongodb+srv://user1:TOj4uPuYuYt4Wepu@cluster0.jfm1r.mongodb.ne
     useUnifiedTopology: true,
 })
     .then(() => {
-        console.log('Connected to MongoDB');
+        console.log('Connected to MongoDB successfully!');
     })
     .catch((error) => {
         console.error('Error connecting to MongoDB:', error);
