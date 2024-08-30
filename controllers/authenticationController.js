@@ -1,0 +1,78 @@
+const User = require("../models/user");
+const jwt = require("jsonwebtoken");
+
+require("dotenv").config();
+
+
+async function register(req, res, next) {
+  try {
+    const {
+      username,
+      email,
+      password,
+      role,
+      
+    } = req.body;
+    const existingUser = await User.findOne({
+      email,
+    });
+
+    if (existingUser) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+
+    const user = new User({
+      username,
+      email,
+      password,
+      role,
+    });
+    await user.save();
+    res.json({ message: "Registration successful" });
+  } catch (error) {
+    next(error);
+  }
+}
+
+const login = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "email not found" });
+    }
+
+    if (user.isBanned == true) {
+      return res.status(405).json({ message: "User is banned" });
+    }
+
+    const passwordMatch = await user.comparePassword(password);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+    if (user.account_status !== "accepted") {
+      return res
+        .status(403)
+        .json({ message: "Check your email to validate your account" });
+    }
+    if (user.role === "company") {
+      const company = await Company.findById(user._id);
+      if (company.company_status !== "accepted") {
+        return res.status(403).json({ message: "Company not validated" });
+      }
+    }
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "1d",
+      }
+    );
+    const role = await User.findOne({ email }).select("role");
+    res.json({ token, role });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {login,register}
