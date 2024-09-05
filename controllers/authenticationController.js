@@ -42,25 +42,11 @@ const login = async (req, res, next) => {
       return res.status(404).json({ message: "email not found" });
     }
 
-    if (user.isBanned == true) {
-      return res.status(405).json({ message: "User is banned" });
-    }
-
     const passwordMatch = await user.comparePassword(password);
     if (!passwordMatch) {
       return res.status(401).json({ message: "Incorrect password" });
     }
-    if (user.account_status !== "accepted") {
-      return res
-        .status(403)
-        .json({ message: "Check your email to validate your account" });
-    }
-    if (user.role === "company") {
-      const company = await Company.findById(user._id);
-      if (company.company_status !== "accepted") {
-        return res.status(403).json({ message: "Company not validated" });
-      }
-    }
+
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.SECRET_KEY,
