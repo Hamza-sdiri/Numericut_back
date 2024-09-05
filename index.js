@@ -13,6 +13,14 @@ const port = process.env.PORT || 3000;
 const machineRouter = require('./routes/machineRoutes');
 const authRouter = require('./routes/authRoutes');
 
+
+// CORS policy
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 mongoose
   .connect(process.env.DB_URI, {
 
