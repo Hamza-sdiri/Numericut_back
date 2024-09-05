@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt')
 
 require("dotenv").config();
 
@@ -11,7 +12,7 @@ async function register(req, res, next) {
       email,
       password,
       role,
-      
+      phone,
     } = req.body;
     const existingUser = await User.findOne({
       email,
@@ -26,6 +27,7 @@ async function register(req, res, next) {
       email,
       password,
       role,
+      phone,
     });
     await user.save();
     res.json({ message: "Registration successful" });
@@ -37,9 +39,9 @@ async function register(req, res, next) {
 const login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email })
     if (!user) {
-      return res.status(404).json({ message: "email not found" });
+      return res.status(404).json({ message: "Email not found" });
     }
 
     const passwordMatch = await user.comparePassword(password);
@@ -47,15 +49,16 @@ const login = async (req, res, next) => {
       return res.status(401).json({ message: "Incorrect password" });
     }
 
+
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: user.role, email:user.email },
       process.env.SECRET_KEY,
       {
         expiresIn: "1d",
       }
     );
-    const role = await User.findOne({ email }).select("role");
-    res.json({ token, role });
+
+    res.json({ token, role: user.role });
   } catch (error) {
     next(error);
   }
