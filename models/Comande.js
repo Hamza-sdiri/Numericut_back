@@ -1,28 +1,42 @@
 const mongoose = require('mongoose');
 
-const ComandeSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
+const ComandeSchema = new mongoose.Schema(
+  {
+    customer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-     description: {
-        type: String,
-        required: true
+    totalPrice: {
+      type: Number,
+      required: true,
+      default: 0.0,
     },
-    SN: {
-        type: String,
-        required: true,
-        unique: true
+    shippingAddress: {
+    type: String,
+    required: true 
     },
-    model: {
-        type: String,
-        required: true
+    paymentMethod: {
+      type: String,
+      required: true,
     },
-    price: {
-        type: String,
-        required: true
-    }
-});
+    orderStatus: {
+      type: String,
+      enum: ["processing", "shipped", "delivered", "cancelled"],
+      default: "processing",
+    },
+    orderedAt: {
+      type: Date,
+      default: Date.now,
+    },
+    deliveredAt: {
+      type: Date,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Comande = mongoose.model('Comande', ComandeSchema);
 
