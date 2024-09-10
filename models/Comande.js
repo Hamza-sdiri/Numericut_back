@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const ComandeSchema = new mongoose.Schema(
   {
     customer: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
       required: true,
     },
     totalPrice: {
