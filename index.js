@@ -12,6 +12,7 @@ const port = process.env.PORT || 3000;
 
 const machineRouter = require('./routes/machineRoutes');
 const authRouter = require('./routes/authRoutes');
+const comandeRouter = require('./routes/comandeRoutes');
 
 
 // CORS policy
@@ -40,6 +41,7 @@ app.use(express.json());
 // Routes
 app.use("/machine",machineRouter);
 app.use("/auth",authRouter);
+app.use("/comande",comandeRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
