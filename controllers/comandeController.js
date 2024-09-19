@@ -43,17 +43,24 @@ exports.getAllComandes = (req, res) => {
 }
 
 exports.updateComande = (req, res) => {
-    const comande = new Comande({
-        _id: req.params.id,
-        name: req.body.name,
-        description: req.body.description,
-        SN: req.body.SN,
-        model: req.body.model,
-        price: req.body.price,
-    });
-    Comande.updateOne({ _id: req.params.id }, comande)
+    Comande.findOne({ _id: req.params.id })
+        .then((comande) => {
+            if (!comande) {
+                return res.status(404).json({ message: 'Comande not found!' });
+            }
+
+            comande.customer = req.body.customer || comande.customer;
+            comande.totalPrice = req.body.totalPrice || comande.totalPrice;
+            comande.shippingAddress = req.body.shippingAddress || comande.shippingAddress;
+            comande.paymentMethod = req.body.paymentMethod || comande.paymentMethod;
+            comande.orderStatus = req.body.orderStatus || comande.orderStatus;
+            comande.orderedAt = req.body.orderedAt || comande.orderedAt;
+            comande.deliveredAt = req.body.deliveredAt || comande.deliveredAt;
+
+            return comande.save();
+        })
         .then(() => {
-            res.status(201).json({ message: 'Comande updated successfully!' });
+            res.status(200).json({ message: 'Comande updated successfully!' });
         })
         .catch((error) => {
             res.status(400).json({ error: error });
