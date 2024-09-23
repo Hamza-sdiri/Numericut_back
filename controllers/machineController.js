@@ -57,12 +57,12 @@ exports.getAllMachines = (req, res) => {
 
 exports.updateMachine = (req, res) => {
     const machine = new Machine({
-        _id: req.params.id,
-        name: req.body.name,
-        description: req.body.description,
-        SN: req.body.type,
-        model: req.body.model,
-        price: req.body.price,
+      _id: req.params.id,
+      name: req.body.name,
+      description: req.body.description,
+      SN: req.body.SN,
+      model: req.body.model,
+      price: req.body.price,
     });
     Machine.updateOne({_id: req.params.id}, machine).then(
         () => {

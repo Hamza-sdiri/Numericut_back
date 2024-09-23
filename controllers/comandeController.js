@@ -1,19 +1,66 @@
-const express = require('express');
 const Comande = require('../models/Comande');
+const User = require('../models/user')
+const nodemailer = require("nodemailer");
+require('dotenv').config();
+
+var transport = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+function sendValidationEmail(userEmail,id) {
+ 
+  // Email options
+  const mailOptions = {
+    from: "numericut@gmail.com",
+    to: userEmail,
+    subject: `your command number : ${id}`,
+    html: `
+    <table width="100%" cellpadding="0" cellspacing="0" style="font-family: Arial, sans-serif;">
+    <tr>
+      <td align="center">
+<img src="https://i.ibb.co/Sm0WvmC/logo.jpg" alt="logo" border="0" />
+<h2 style="color: #BD2C43; text-align: center;">Your command is saved successfully</h2>
+        <p>one of our staff will contact you very shortly</p>
+      </td>
+    </tr>
+  </table>
+    `,
+  };
+
+  transport.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log("Error sending validation email:", error);
+    } else {
+      console.log("Validation email sent:", info.response);
+    }
+  });
+}
+
+
 
 exports.createComande = (req, res) => {
     const comande = new Comande({
-        customer: req.body.customer, // ObjectId of the user
-        totalPrice: req.body.totalPrice, // Total price of the order
-        shippingAddress: req.body.shippingAddress, // Shipping address for the order
-        paymentMethod: req.body.paymentMethod, // Payment method used
-        orderStatus: req.body.orderStatus || 'processing', // Defaults to 'processing' if not provided
-        orderedAt: req.body.orderedAt || Date.now(), // Defaults to current date if not provided
-        deliveredAt: req.body.deliveredAt // Can be null if not provided
+        customer: req.body.customer, 
+        totalPrice: req.body.totalPrice, 
+        shippingAddress: req.body.shippingAddress, 
+        paymentMethod: req.body.paymentMethod, 
+        orderStatus: req.body.orderStatus || 'processing', 
+        orderedAt: req.body.orderedAt || Date.now(), 
+        deliveredAt: req.body.deliveredAt 
     });
-
+  // Sending the email
+    
     comande.save()
         .then(() => {
+            User.findOne({username:req.body.customer})
+            .then((user) => {
+              sendValidationEmail(user.email,comande.id);
+            })
             res.status(201).json({ message: 'Comande saved successfully!' });
         })
         .catch((error) => {
