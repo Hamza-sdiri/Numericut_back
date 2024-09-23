@@ -79,4 +79,18 @@ const getAllUsers = async (req, res) => {
     next(error);
   }
 };
+const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;  // Extract user ID from the request parameters
+    const user = await User.findByIdAndDelete(id);  // Use Mongoose's findByIdAndDelete method
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });  // If the user doesn't exist, return 404
+    }
+
+    res.json({ message: 'User deleted successfully', user });  // Respond with a success message and the deleted user data
+  } catch (error) {
+    next(error);  // Pass the error to the error-handling middleware
+  }
+};
 module.exports = { login, register, getAllUsers };
