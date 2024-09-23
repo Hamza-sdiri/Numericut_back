@@ -68,6 +68,15 @@ const login = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+
 };
 
-module.exports = {login,register}
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = { login, register, getAllUsers };
