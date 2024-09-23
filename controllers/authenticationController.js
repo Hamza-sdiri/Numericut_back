@@ -93,4 +93,4 @@ const deleteUser = async (req, res, next) => {
     next(error);  // Pass the error to the error-handling middleware
   }
 };
-module.exports = { login, register, getAllUsers };
+module.exports = { login, register, getAllUsers, deleteUser };
